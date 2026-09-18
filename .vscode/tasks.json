@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "构建 coolc",
+            "detail": "调用 build.bat：g++ src\\*.cpp -o coolc.exe（含 -g 调试信息）",
+            "type": "shell",
+            "command": "cmd",
+            "args": ["/c", "build.bat"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "group": { "kind": "build", "isDefault": true },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "编译并运行 factorial.cl（全流程）",
+            "detail": "Cool -> LLVM IR -> llvm-as 校验 -> 链接 runtime -> 运行",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "build.bat && coolc.exe tests\\factorial.cl -o factorial.ll && llvm-as factorial.ll -o factorial.bc && clang factorial.ll runtime.c -o factorial.exe && factorial.exe"
+            ],
+            "options": { "cwd": "${workspaceFolder}" },
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "为当前 .cl 文件生成 LLVM IR",
+            "detail": "对当前打开的 .cl 生成同名 .ll",
+            "type": "shell",
+            "command": "cmd",
+            "args": ["/c", "coolc.exe \"${file}\" -o \"${fileBasenameNoExtension}.ll\""],
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": []
+        },
+        {
+            "label": "打印当前 .cl 的 AST",
+            "detail": "用 --dump 打印语法树（调试 parser 用）",
+            "type": "shell",
+            "command": "cmd",
+            "args": ["/c", "coolc.exe \"${file}\" --dump"],
+            "options": { "cwd": "${workspaceFolder}" },
+            "problemMatcher": []
+        }
+    ]
+}
