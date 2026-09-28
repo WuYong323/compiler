@@ -365,10 +365,10 @@ program
 ```
 
 **验证点**（对照 01 篇的优先级表）：
-- `n * fact(n - 1)` 中 `fact(n-1)` 作为 `*` 的右操作数整块解析 ✅（分派比 `*` 紧）
-- `n - 1` 正确成为 `fact` 的实参 ✅
-- `fact(n-1)` 是 self-dispatch → `dispatch .fact (object self, ...)` ✅
-- `if n = 0 then...` 中 `=` 是相等比较（不是赋值）✅
+- `n * fact(n - 1)` 中 `fact(n-1)` 作为 `*` 的右操作数整块解析 （分派比 `*` 紧）
+- `n - 1` 正确成为 `fact` 的实参 
+- `fact(n-1)` 是 self-dispatch → `dispatch .fact (object self, ...)` 
+- `if n = 0 then...` 中 `=` 是相等比较（不是赋值）
 
 ---
 

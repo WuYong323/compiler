@@ -5,7 +5,7 @@
 - 标签：#编译原理 #CS143 #类型检查 #类型系统 #子类型 #SELF_TYPE #静态分析
 - 一句话结论：类型检查用**类型环境（O, M, C）**和一组**类型规则**自底向上推断每个表达式的类型，并保证**静态类型是动态类型的上界**（soundness）。
 - 相关笔记：`05_符号表.md`（环境来源）、`01_Cool语言精讲.md`（类型规则依据）
-- 产出代码：`projects/coolc/src/typechecker.h`、`typechecker.cpp`
+- 产出代码：`coolc/src/typechecker.h`、`typechecker.cpp`
 
 ---
 
