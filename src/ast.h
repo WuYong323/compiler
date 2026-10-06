@@ -1,4 +1,4 @@
-#pragma once
+#pragma once          // 这个头文件在同一个编译单元（translation unit）里只被包含一次。
 #include <memory>
 #include <string>
 #include <vector>
@@ -126,7 +126,7 @@ struct NoExpr : Expr {
 };
 
 // ================= 特性（attribute / method） =================
-struct Formal { std::string name; std::string type; };
+struct Formal { std::string name; std::string type; }; 
 
 struct Feature {
   int line = 0;

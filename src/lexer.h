@@ -11,12 +11,12 @@ namespace cool {
         public:
             // 按值持有源码（move），避免持有 ss.str() 临时对象的悬垂引用
             explicit Lexer(std::string src) : src_(std::move(src)) {
-            // 跳过 UTF-8 BOM（EF BB BF）：部分编辑器/工具会在文件头写入
-            if (src_.size() >= 3 && (unsigned char)src_[0] == 0xEF &&
-                (unsigned char)src_[1] == 0xBB && (unsigned char)src_[2] == 0xBF) {
-                pos_ = 3;
+                // 跳过 UTF-8 BOM（EF BB BF）：部分编辑器/工具会在文件头写入
+                if (src_.size() >= 3 && (unsigned char)src_[0] == 0xEF &&
+                    (unsigned char)src_[1] == 0xBB && (unsigned char)src_[2] == 0xBF) {
+                    pos_ = 3;
+                }
             }
-        }
         Token next();                 // 返回下一个 token（EOF 时为 END）
 
         private:
