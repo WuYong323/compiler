@@ -66,7 +66,7 @@ struct Assign : Expr {
 };
 struct Dispatch : Expr {   // e.f(args)；self-dispatch 时 receiver=Object("self")
   std::unique_ptr<Expr> receiver; std::string method;
-  std::vector<std::unique_ptr<Expr>> args;
+  std::vector<std::unique_ptr<Expr>> args; 
   void accept(ExprVisitor& v) const override { v.visit(*this); }
 };
 struct StaticDispatch : Expr {   // e@T.f(args)

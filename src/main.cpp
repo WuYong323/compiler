@@ -1,27 +1,47 @@
+// src/main.cpp
 #include <fstream>
-#include <iostream>
 #include <sstream>
+#include <iostream>
+#include <string>
+#include <exception>
+
 #include "lexer.h"
-using namespace cool;
+#include "parser.h"
+#include "ast.h"
+#include "dump.h" 
 
-int main(int argc, char** argv) {
-  if (argc < 2) { std::cerr << "usage: coolc <file.cl>\n"; return 2; }
-  std::ifstream in(argv[1]);
-  if (!in) { std::cerr << "cannot open: " << argv[1] << "\n"; return 2; }
-  std::stringstream ss; ss << in.rdbuf();
-  Lexer lex(ss.str());
-
-  bool hadError = false;
-  for (;;) {
-    Token t = lex.next();
-    if (t.kind == Tok::END) break;
-    if (t.kind == Tok::ERROR) {
-      std::cerr << "ERROR: line " << t.line << ": " << t.lexeme << "\n";
-      hadError = true;
-      break;               // 本阶段遇错即停；错误恢复在 doc 03/05 完善
+int main(int argc, char* argv[]) {
+    // ① 参数检查
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <source-file>\n";
+        return 1;
     }
-    std::cout << "line " << t.line << ": " << tokName(t.kind)
-              << "  '" << t.lexeme << "'\n";
-  }
-  return hadError ? 1 : 0;
+
+    // ② 读取源文件
+    std::ifstream fin(argv[1]);
+    if (!fin) {
+        std::cerr << "Cannot open file: " << argv[1] << "\n";
+        return 1;
+    }
+    std::stringstream buf;
+    buf << fin.rdbuf();
+    std::string source = buf.str();
+
+    // ③ 词法分析 + 语法分析 + 打印
+    try {
+        // 注意：Parser 构造函数直接接收 std::string 源码
+        cool::Parser parser(source); 
+        
+        // 注意：返回的是 Program 对象（值），不是 unique_ptr
+        cool::Program program = parser.parseProgram();
+
+        // 注意：调用独立函数 dumpProgram，且传入的是对象引用
+        cool::dumpProgram(program, std::cout);
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        return 1;
+    }
+
+    return 0;
 }
