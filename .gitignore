@@ -1,0 +1,6 @@
+*.exe
+*.o
+*.ll
+.tmp/
+build.log
+

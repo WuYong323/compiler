@@ -1,47 +1,46 @@
-// src/main.cpp
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <string>
-#include <exception>
-
 #include "lexer.h"
 #include "parser.h"
-#include "ast.h"
-#include "dump.h" 
+#include "dump.h"
+#include "typechecker.h"
+#include "codegen.h"
+using namespace cool;
 
-int main(int argc, char* argv[]) {
-    // ① 参数检查
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <source-file>\n";
-        return 1;
-    }
+int main(int argc, char** argv) {
+  if (argc < 2) { std::cerr << "usage: coolc <file.cl> [--dump] [-o out.ll]\n"; return 2; }
+  std::string inFile = argv[1];
+  std::string outFile;
+  bool dumpFlag = false;
+  for (int i = 2; i < argc; ++i) {
+    std::string a = argv[i];
+    if (a == "--dump") dumpFlag = true;
+    else if (a == "-o" && i + 1 < argc) outFile = argv[++i];
+    else { std::cerr << "unknown arg: " << a << "\n"; return 2; }
+  }
+  std::ifstream in(inFile);
+  if (!in) { std::cerr << "cannot open: " << inFile << "\n"; return 2; }
+  std::stringstream ss; ss << in.rdbuf();
 
-    // ② 读取源文件
-    std::ifstream fin(argv[1]);
-    if (!fin) {
-        std::cerr << "Cannot open file: " << argv[1] << "\n";
-        return 1;
-    }
-    std::stringstream buf;
-    buf << fin.rdbuf();
-    std::string source = buf.str();
+  try {
+    Parser parser(ss.str());
+    Program prog = parser.parseProgram();
+    if (dumpFlag) { dumpProgram(prog, std::cout); return 0; }
 
-    // ③ 词法分析 + 语法分析 + 打印
-    try {
-        // 注意：Parser 构造函数直接接收 std::string 源码
-        cool::Parser parser(source); 
-        
-        // 注意：返回的是 Program 对象（值），不是 unique_ptr
-        cool::Program program = parser.parseProgram();
+    TypeChecker tc(prog);
+    if (!tc.check()) { std::cerr << "type checking failed\n"; return 1; }
 
-        // 注意：调用独立函数 dumpProgram，且传入的是对象引用
-        cool::dumpProgram(program, std::cout);
-    }
-    catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << "\n";
-        return 1;
-    }
-
+    CodeGen cg(prog);
+    std::string ir = cg.generate();
+    if (outFile.empty()) outFile = "out.ll";
+    std::ofstream out(outFile);
+    out << ir;
+    std::cout << "wrote " << outFile << " (" << ir.size() << " bytes)\n";
     return 0;
+  } catch (const std::exception& e) {
+    std::cerr << "ERROR: " << e.what() << "\n";
+    return 1;
+  }
 }
